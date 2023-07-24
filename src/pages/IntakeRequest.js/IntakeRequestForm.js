@@ -66,7 +66,7 @@ export default function IntakeRquestForm() {
         if (validate()) {
             console.log(values);
             // resetForm()
-            addNewPost({ url: '/intake-form', method: 'POST', payload: values })
+            addNewPost({ url: '/intake-form/', method: 'POST', payload: values })
                 .unwrap()
                 .then((res) => {
                     setOpen(true);
