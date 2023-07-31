@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const apiSlice = createApi({
     reducerPath: 'apiSlice',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'https://iamhirenpatel.pythonanywhere.com/api/',
+        baseUrl: 'http://13.234.226.222:8000/api/',
     }),
     // tagTypes: ['Post'],
     endpoints: (builder) => {
