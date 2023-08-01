@@ -18,6 +18,7 @@ export const apiSlice = createApi({
                         method: method,
                         body: payload,
                         headers: {
+                            'access-control-allow-origin': '*',
                             'Content-type': 'application/json; charset=UTF-8',
                         },
                     })
