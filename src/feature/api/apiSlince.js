@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 export const apiSlice = createApi({
     reducerPath: 'apiSlice',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://13.234.226.222:8000/api/',
+        baseUrl: ' https://ea8b-103-204-189-64.ngrok-free.app/api/',
     }),
     // tagTypes: ['Post'],
     endpoints: (builder) => {
@@ -18,7 +18,6 @@ export const apiSlice = createApi({
                         method: method,
                         body: payload,
                         headers: {
-                            'access-control-allow-origin': '*',
                             'Content-type': 'application/json; charset=UTF-8',
                         },
                     })

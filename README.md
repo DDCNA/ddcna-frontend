@@ -1,3 +1,13 @@
 # DCNA-Intake
+
 DCNA-Intake request form
-# ddcna-frontend
+
+## Getting started
+
+Clone from GitHub
+
+```
+git clone https://github.com/Farhin15/DCNA-Admin.git
+npm i
+npm start
+```

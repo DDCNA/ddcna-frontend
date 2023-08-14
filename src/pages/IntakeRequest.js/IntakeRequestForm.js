@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormControl, Grid, Typography, } from '@material-ui/core';
+import { CircularProgress, FormControl, Grid, Typography, } from '@material-ui/core';
 import Controls from "../../components/controls/Controls";
 import { useForm, Form } from '../../components/useForm';
 import * as employeeService from "../../services/employeeService";
@@ -7,6 +7,7 @@ import { useAddNewPostMutation } from '../../feature/api/apiSlince'
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import img from '../../asset/image/success.png'
+import ThankYou from '../../components/Thankyou';
 let requestor_typeItems = []
 
 const requestTypeItems = [
@@ -32,7 +33,10 @@ const initialFValues = {
 export default function IntakeRquestForm() {
     const [addNewPost, response] = useAddNewPostMutation()
     const [open, setOpen] = React.useState(false);
+    const [success, setsuccess] = React.useState(false);
+    const [Error, setError] = React.useState(false);
     const [isSubmit, setIsSubmit] = React.useState(false);
+    const [isSubmiting, setIsSubmiting] = React.useState(false);
 
     const validate = (fieldValues = values) => {
         let temp = { ...errors }
@@ -44,6 +48,8 @@ export default function IntakeRquestForm() {
             temp.email = !fieldValues.email ? "This field is required." : (/$^|.+@.+..+/).test(fieldValues.email) ? "" : "Email is not valid."
         if ('state' in fieldValues)
             temp.state = fieldValues.state.length != 0 ? "" : "This field is required."
+        if ('isChecked' in fieldValues)
+            temp.isChecked = fieldValues.isChecked === true ? "" : "This field is required."
         setErrors({
             ...temp
         })
@@ -64,48 +70,68 @@ export default function IntakeRquestForm() {
     const handleSubmit = e => {
         e.preventDefault()
         if (validate()) {
-            console.log(values);
+            setIsSubmiting(true)
             // resetForm()
             addNewPost({ url: '/intake-form/', method: 'POST', payload: values })
                 .unwrap()
                 .then((res) => {
                     setOpen(true);
+                    setError('');
+                    setsuccess('Request submitted successfully!');
                     setIsSubmit(true);
+                    setIsSubmiting(false)
                     resetForm();
                 })
                 .catch((error) => {
-                    console.log(error)
+                    setIsSubmiting(false)
+                    setOpen(true);
+                    setsuccess('');
+                    setError(error.data.message)
                 })
         }
     }
 
     return (
         <>
+            {isSubmiting ? <div className="loader">
+                <div className="loader-center">
+                    <CircularProgress
+                        size={70} />
+                </div>
+            </div> : <></>}
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                 open={open}
-                autoHideDuration={3000} onClose={() => setOpen(false)}>
-                <Alert onClose={() => setOpen(false)} sx={{ color: '#ffffff' }} severity="success" variant="filled">
-                    Request submitted successfully!
+                autoHideDuration={2000} onClose={() => setOpen(false)}>
+                <Alert onClose={() => setOpen(false)} sx={{ color: '#ffffff' }} severity={success ? "success" : "error"} variant="filled">
+                    {success ? success : Error}
                 </Alert>
             </Snackbar>
             <Form onSubmit={handleSubmit}>
                 <Grid container>
-                    {isSubmit ? <Grid item xs={12} style={{ textAlign: "center" }}>
-                        <img src={img} />
+                    {isSubmit ? <Grid container justifyContent='center' style={{ textAlign: "center" }}>
+                        <ThankYou />
                     </Grid> : <Grid item xs={10}>
                         <Controls.Select
                             name="state"
                             label="Select State Of Residence"
                             value={values.state}
                             onChange={(e) => {
-                                console.log(e.target.value);
+                                resetForm();
+                                setErrors({
+                                    first_name: '',
+                                    last_name: '',
+                                    email: '',
+                                    state: '',
+                                    isChecked: ''
+                                })
+                                setValues(initialFValues);
                                 requestor_typeItems = [{ id: 'Customer', title: 'Customer' }];
                                 if (e.target.value == 'CA') {
                                     requestor_typeItems = [{ id: 'Customer', title: 'Customer' },
                                     { id: 'Employee', title: 'Employee' },
                                     { id: 'Job Applicant', title: 'Applicant' },
-                                    { id: 'Vendor', title: 'Franchisee' },]
+                                    { id: 'Vendor', title: 'Vendor' },]
                                 }
                                 values.requestor_type = 'Customer';
                                 handleInputChange(e)
@@ -119,6 +145,7 @@ export default function IntakeRquestForm() {
                             label="I certify that i am currently a residents of this state"
                             value={values.isChecked}
                             onChange={handleInputChange}
+                            error={errors.isChecked}
                         />
                             <FormControl>
                                 <Typography mt={2}>A separate request must be submitted for each privacy right request, such as delete or access,</Typography>
